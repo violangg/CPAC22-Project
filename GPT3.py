@@ -31,7 +31,8 @@ else:
 
 print(tracks)
 
-
+valence_values = []
+arousal_values = []
 for i in range(5):
     # Replace "SONG_ID" with the ID of the song you want to analyze
     song_id = tracks[i]
@@ -46,5 +47,21 @@ for i in range(5):
     audio_features = response.json()
 
     # Print the valence and arousal values for the song
+    valence_values.append(audio_features["valence"])
+    arousal_values.append(audio_features["energy"])
     print("Valence:", audio_features["valence"])
     print("Arousal:", audio_features["energy"])
+
+
+#Show results
+import numpy as np
+import matplotlib.pyplot as plt
+
+X = ['Song 1', 'Song 2', 'Song 3', 'Song 4', 'Song 5']
+  
+X_axis = np.arange(len(X))
+
+plt.bar(X_axis - 0.2, valence_values, 0.4, label = 'Valence')
+plt.bar(X_axis + 0.2, arousal_values, 0.4, label = 'Arousal')
+
+plt.show()
