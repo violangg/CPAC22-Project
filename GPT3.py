@@ -24,5 +24,27 @@ else:
   data = json.loads(response.text) 
  
   # Loop through the list of songs and print their names 
+  tracks = []
   for track in data["items"]: 
+    tracks.append(track['track']['id'])
     print(f"Track: {track['track']['name']}")
+
+print(tracks)
+
+
+for i in range(5):
+    # Replace "SONG_ID" with the ID of the song you want to analyze
+    song_id = tracks[i]
+
+    # Make a GET request to the /audio-features endpoint of the Spotify Web API
+    response = requests.get(
+        f"https://api.spotify.com/v1/audio-features/{song_id}",
+        headers={"Authorization": f"Bearer {spotify_token}"},
+    )
+
+    # Parse the response as JSON
+    audio_features = response.json()
+
+    # Print the valence and arousal values for the song
+    print("Valence:", audio_features["valence"])
+    print("Arousal:", audio_features["energy"])
