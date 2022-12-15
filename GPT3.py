@@ -25,6 +25,7 @@ else:
  
   # Loop through the list of songs and print their names 
   tracks = []
+
   for track in data["items"]: 
     tracks.append(track['track']['id'])
     print(f"Track: {track['track']['name']}")
@@ -33,6 +34,7 @@ print(tracks)
 
 valence_values = []
 arousal_values = []
+
 for i in range(5):
     # Replace "SONG_ID" with the ID of the song you want to analyze
     song_id = tracks[i]
@@ -53,7 +55,7 @@ for i in range(5):
     print("Arousal:", audio_features["energy"])
 
 
-#Show results
+# Show results
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -61,7 +63,34 @@ X = ['Song 1', 'Song 2', 'Song 3', 'Song 4', 'Song 5']
   
 X_axis = np.arange(len(X))
 
+plt.figure()
 plt.bar(X_axis - 0.2, valence_values, 0.4, label = 'Valence')
 plt.bar(X_axis + 0.2, arousal_values, 0.4, label = 'Arousal')
 
-plt.show()
+
+# VA mapping into colors
+
+import numpy as np
+from VAmapping import assign_colors_to_quadrants
+from VAmapping import convert_range
+
+coordinates = np.zeros((5,2))
+
+for i in range(5):
+    x = convert_range(valence_values[i])
+    y = convert_range(arousal_values[i])
+    coordinates[i, 0] = x
+    coordinates[i, 1] = y
+
+print(coordinates)
+
+x = coordinates[:, 0]
+y = coordinates[:, 1]
+RGBA_colors = assign_colors_to_quadrants(x, y)
+print(RGBA_colors)
+
+
+from VAmapping import plot_colors
+
+plot_colors(RGBA_colors)
+#plt.show()
