@@ -17175,3 +17175,5 @@ bonny-venv/Lib/site-packages/numpy/__init__.pxd
 bonny-venv/Lib/site-packages/numpy/__init__.cython-30.pxd
 bonny-venv/Lib/site-packages/numpy/__config__.py
 bonny-venv/Lib/site-packages/numpy/.libs/libopenblas.FB5AE2TYXYH2IJRDKGDGQ3XBKLKTF43H.gfortran-win_amd64.dll
+
+cpac-proj/
