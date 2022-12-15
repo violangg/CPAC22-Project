@@ -1,0 +1,52 @@
+import pygame
+from PIL import Image
+
+# Define some colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+
+# Create the screen and set the width and height
+screen = pygame.display.set_mode((1800, 800))
+
+# Set the background color
+screen.fill(WHITE)
+
+# Load the album covers
+album_cover_1 = pygame.image.load("album_cover_1.jpg")
+album_cover_1 = pygame.transform.scale(album_cover_1, (200, 200))
+album_cover_2 = pygame.image.load("album_cover_2.jpg")
+album_cover_2 = pygame.transform.scale(album_cover_2, (200, 200))
+album_cover_3 = pygame.image.load("album_cover_3.jpg")
+album_cover_3 = pygame.transform.scale(album_cover_3, (200, 200))
+
+# Create the room
+# This could be done by drawing the walls and floor using the pygame.draw module
+# or by loading an image of a room
+room = pygame.image.load("room.png")
+room = pygame.transform.scale(room, (1800, 800))
+
+# Draw the room on the screen
+screen.blit(room, (0, 0))
+
+# Draw the album covers on the walls
+# You can use the blit() method to draw an image on the screen at a specified position
+screen.blit(album_cover_1, (800, 400))
+screen.blit(album_cover_2, (100, 100))
+screen.blit(album_cover_3, (1200, 500))
+
+# Update the screen
+pygame.display.flip()
+
+# Run the event loop
+while True:
+    # Get any events that have occurred
+    events = pygame.event.get()
+    # Process each event
+    for event in events:
+        # If the event is the QUIT event, exit the loop
+        if event.type == pygame.QUIT:
+            break
+    # Update the screen
+    pygame.display.flip()
+
+    pygame.image.save(screen, "room_with_album_covers.jpg")

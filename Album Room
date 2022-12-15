@@ -1,0 +1,35 @@
+# Import modules
+import tkinter as tk
+from PIL import Image, ImageTk
+
+# Create a window
+root = tk.Tk()
+root.title("Simple Room")
+
+# Load album cover images
+image1 = Image.open(r"C:\Users\giobo\Documents\GitHub\CPAC22-Project\darksideofthemoon.jpg")
+image2 = Image.open(r"C:\Users\giobo\Documents\GitHub\CPAC22-Project\antsfromupthere.jpg")
+image3 = Image.open(r"C:\Users\giobo\Documents\GitHub\CPAC22-Project\lostinthedream.jpg")
+
+# Resize album cover images
+image1 = image1.resize((200, 200), Image.ANTIALIAS)
+image2 = image2.resize((200, 200), Image.ANTIALIAS)
+image3 = image3.resize((200, 200), Image.ANTIALIAS)
+
+# Create ImageTk objects
+image1_tk = ImageTk.PhotoImage(image1)
+image2_tk = ImageTk.PhotoImage(image2)
+image3_tk = ImageTk.PhotoImage(image3)
+
+# Create Label widgets
+label1 = tk.Label(root, image=image1_tk)
+label2 = tk.Label(root, image=image2_tk)
+label3 = tk.Label(root, image=image3_tk)
+
+# Position Label widgets
+label1.pack(side="left")
+label2.pack(side="right")
+label3.pack(side="bottom")
+
+# Run the GUI
+root.mainloop()
