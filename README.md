@@ -39,4 +39,4 @@ Also, a desirable side upgrade could be to make the interaction between the user
 
 # Workflow
 
-![Alt text](https://drive.google.com/file/d/1Dlw6Yf8Rewfjfj6yXaEW3DXYi2chn_QC/view?usp=share_link)
+![Workflow](workflow.png)
