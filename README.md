@@ -4,8 +4,6 @@ Creative Programming and Computing
 
 A. Y. 2022-2023
 
-Abstract of the project
-
 # MUSICAL PORTRAIT
 
 ## Members of the group 
@@ -15,7 +13,7 @@ Abstract of the project
 4.	Enrico Francesco Valente (https://github.com/enricovalente23)
 
 ## Github repository
-[Link text](https://github.com/violangg/CPAC22-Project)
+[github.com/violangg/CPAC22-Project](https://github.com/violangg/CPAC22-Project)
 
 # Abstract
 Here we present a method for creating a portrait of a person based on their listening habits. The main goal is to create a unique and personalized depiction of the person that reflects their musical preferences. Our method is a novel approach to creating portraits and has potential applications in the fields of art, music, and personalization.
