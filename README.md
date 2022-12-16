@@ -5,10 +5,6 @@ A. Y. 2022-2023
 Abstract of the project
 
 # MUSICAL PORTRAIT
-_Title is temporary and can be changed later on. The group will be referred with the name of the group_
-
-## Name of the group
-_This will be assigned by the teachers. Do not fill this field yet_
 
 ## Members of the group 
 1.	Giorgio Bonizzi (https://github.com/Embodynglmp)
@@ -17,7 +13,7 @@ _This will be assigned by the teachers. Do not fill this field yet_
 4.	Enrico Francesco Valente (https://github.com/enricovalente23)
 
 ## Github repository
-https://github.com/violangg/CPAC22-Project
+github.com/violangg/CPAC22-Project
 
 # Abstract
 Here we present a method for creating a portrait of a person based on their listening habits. The main goal is to create a unique and personalized depiction of the person that reflects their musical preferences. Our method is a novel approach to creating portraits and has potential applications in the fields of art, music, and personalization.
@@ -38,5 +34,4 @@ It could be interesting as well to realize a 3D mesh of the user's face instead 
 Also, a desirable side upgrade could be to make the interaction between the user and the application easier, without having to request every time a token to use Spotify APIs.
 
 # Workflow
-
 ![Workflow](workflow.png)
