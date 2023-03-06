@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from MuPo.spotify import get_authorization_url
 import requests
-
+import os
 from django.shortcuts import redirect
 from spotipy.oauth2 import SpotifyOAuth
 from django_cpac.secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI
@@ -35,11 +35,19 @@ def exchange_code(request):
     response = requests.post(AUTH_TOKEN_URL, data=data)
     response_data = response.json()
     access_token = response_data['access_token']
-    refresh_token = response_data['refresh_token']
-    expires_in = response_data['expires_in']
+    # refresh_token = response_data['refresh_token']
+    # expires_in = response_data['expires_in']
+
+    file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'access_token.txt')
+    print("File path:", file_path)
+    with open(file_path, 'w') as f:
+        f.write(access_token)
+
+
     # Save access token and refresh token in database for the user
     return redirect('postauth')
 
 def postauth(request):
     return render(request, 'postauth.html')
+
 
