@@ -1,10 +1,71 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>MuPo</title>
 </head>
 <body>
-  <h1>Shall we start?</h1>
+  <h1>Great! Here are the last 5 songs you listened to:</h1>
+  <ul>
+    {% for track in tracks %}
+        <li>
+            <img src="{{ track.album_cover_url }}" alt="{{ track.name }} cover">
+            <span>{{ track.name }} - {{ track.artist }}</span>
+        </li>
+    {% endfor %}
+  </ul>
   <button>Load photo</button>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MuPo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .album-cover {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .track-info {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <h1>Great! Here are the last 5 songs you listened to:</h1>
+    <ul>
+        {% for track in tracks %}
+            <li>
+                <img class="album-cover" src="{{ track.album_cover_url }}" alt="{{ track.name }} cover">
+                <div class="track-info">
+                    <h3>{{ track.name }}</h3>
+                    <p>{{ track.artist }}</p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

@@ -12,3 +12,5 @@ def get_authorization_url():
     }
     auth_url = AUTH_URL + "?" + "&".join([f"{k}={v}" for k, v in params.items()])
     return auth_url
+
+
