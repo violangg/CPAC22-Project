@@ -5,6 +5,8 @@ from django_cpac.secrets import SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIP
 import requests
 from spotipy.oauth2 import SpotifyOAuth
 import json
+import numpy as np
+import cv2
 
 def index(request):
     auth_url= get_authorization_url()
@@ -18,8 +20,90 @@ def postauth(request):
     access_token = token['access_token']
     tracks = get_recently_played(access_token)
 
+    x1, y1 = map_features(tracks, access_token)
+    create_style(x1, y1)
+
     return render(request, 'postauth.html', {'tracks': tracks})
 
+def upload(request):
+    return render(request, 'upload.html')
+
+def process_image(request):
+    if request.method == 'POST':
+        image = request.FILES['image']
+        # Process the image here
+        # You can access the uploaded image using `image` variable
+        # Perform any desired image processing tasks
+        
+        # Return the processed image or relevant information
+        return render(request, 'result.html', {'image_url': image.url})
+
+    return render(request, 'upload.html')
+
+
+def map_features(tracks, token): 
+    valence_values = []
+    arousal_values = []
+
+    for track in tracks:
+        song_id = track['id']
+
+        response = requests.get(
+            f"https://api.spotify.com/v1/audio-features/{song_id}",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        audio_features = response.json()
+        print(audio_features)
+        valence_values.append(audio_features["valence"])
+        arousal_values.append(audio_features["energy"])
+
+    coordinates = np.zeros((5,2))
+
+    for i in range(5):
+        x = valence_values[i] * 2 - 1
+        y = arousal_values[i] * 2 - 1
+        coordinates[i, 0] = x
+        coordinates[i, 1] = y
+
+    print(coordinates)
+
+    x0 = coordinates[0, 0]
+    y0 = coordinates[0, 1]
+    x2 = coordinates[1, 0]
+    y2 = coordinates[1, 1]
+    x3 = coordinates[2, 0]
+    y3 = coordinates[2, 1]
+    x4 = coordinates[3, 0]
+    y4 = coordinates[3, 1]
+    x5 = coordinates[4, 0]
+    y5 = coordinates[4, 1]
+
+    x1 = np.mean([x0, x2, x3, x4, x5])
+    y1 = np.mean([y0, y2, y3, y4, y5])
+    print('Coordinates correctly computed')
+
+    return x1, y1
+
+def create_style(x1, y1):
+    img = cv2.imread('roy.jpeg')
+
+    # Quadrant I: x > 0, y > 0
+    if x1 > 0 and y1 > 0:
+        colormap = cv2.COLORMAP_SPRING # yellow/pink, euphoria
+    # Quadrant II: x < 0, y > 0
+    elif x1 < 0 and y1 > 0:
+        colormap = cv2.COLORMAP_HOT #red/yellow, anger
+    # Quadrant III: x < 0, y < 0
+    elif x1 < 0 and y1 < 0:
+        colormap = cv2.COLORMAP_OCEAN # blue, sadness  
+    # Quadrant IV: x > 0, y < 0
+    elif x1 > 0 and y1 < 0:
+        colormap = cv2.COLORMAP_SUMMER #green, relax
+
+    img = cv2.applyColorMap(img, colormap)
+    cv2.imwrite('style.png', img)
+
+    print('Style image processed and saved.')
 
 
 def get_access_token(request):
@@ -42,12 +126,16 @@ def get_recently_played(access_token):
         data = json.loads(response.text) 
     
     tracks = []
-    for track in data["items"]: 
-        tracks.append(track['track']['id'])
-        print(f"Track: {track['track']['name']}")
-    print(tracks)
+    for item in data["items"]:
+        track_info = {
+            'id': item['track']['id'],
+            'title': item['track']['name'],
+            'artist': item['track']['artists'][0]['name'],
+            'album_cover': item['track']['album']['images'][0]['url'],
+            'preview_url': item['track']['preview_url']
+        }
+        tracks.append(track_info)
+        print(f"Track: {track_info['title']}")
+        print(track_info)
 
-    # return response.json()
     return tracks
-
-

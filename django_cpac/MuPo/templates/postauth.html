@@ -1,71 +1,107 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <title>MuPo</title>
-</head>
-<body>
-  <h1>Great! Here are the last 5 songs you listened to:</h1>
-  <ul>
-    {% for track in tracks %}
-        <li>
-            <img src="{{ track.album_cover_url }}" alt="{{ track.name }} cover">
-            <span>{{ track.name }} - {{ track.artist }}</span>
-        </li>
-    {% endfor %}
-  </ul>
-  <button>Load photo</button>
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MuPo</title>
+    <title>Music Portrait</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000000;
+            font-family: Verdana, sans-serif
+        }
+
+        #video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
         }
 
         h1 {
-            text-align: center;
+            margin-top: 9%;
+            color: #ffffff;
+        }
+        
+        .track-container {
+            display: inline-block;
+            margin-top: 30px;
+            margin-inline: 10px;
+            text-align: left;
+            background-color: #e8e8e8;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 20px;
+        .track-container img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
         }
 
-        li {
+        .track-container h2 {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .track-container p {
+            margin-top: -10px;
+            font-size: 14px;
+        }
+
+        .track-container audio {
+            margin-top: 5px;
+            width: 200px;
+        }
+
+        .btn {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            color: rgb(0, 0, 0);
+            background-color: #b7b7b7;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 30px;
+            width: 60px;
+            margin-left: 46.5%;
+            margin-top: 3%;
+            }
+
+        .btn:hover {
+        background-color: #0056b3;
         }
 
-        .album-cover {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
+        .btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #0056b3;
         }
 
-        .track-info {
-            display: flex;
-            flex-direction: column;
-        }
     </style>
 </head>
 <body>
-    <h1>Great! Here are the last 5 songs you listened to:</h1>
-    <ul>
-        {% for track in tracks %}
-            <li>
-                <img class="album-cover" src="{{ track.album_cover_url }}" alt="{{ track.name }} cover">
-                <div class="track-info">
-                    <h3>{{ track.name }}</h3>
-                    <p>{{ track.artist }}</p>
-                </div>
-            </li>
-        {% endfor %}
-    </ul>
+    <video id="video-background" autoplay loop muted>
+        <source src="https://images.fastcompany.net/image/upload/w_1153,ar_16:9,c_fill,g_auto,f_webm,q_70/wp-cms/uploads/2019/07/p-1-90375683an-astrophysicist-explains-the-most-famous-album-art-of-the-century.gif"  
+        type="video/webm">
+    </video>
+    <h1>Great!<br> Here are the last 5 songs you listened to:</h1>
+    {% for track in tracks %}
+    <div class="track-container">
+        <img src="{{ track.album_cover }}" alt="Album Cover">
+        <h2>{{ track.title }}</h2>
+        <p>{{ track.artist }}</p>
+        <audio controls>
+            <source src="{{ track.preview_url }}" type="audio/mpeg">
+        </audio>
+    </div>
+    {% endfor %}
+    <a href="http://127.0.0.1:8000/MuPo/upload" class="btn"><b>Proceed</b></a>
 </body>
 </html>
