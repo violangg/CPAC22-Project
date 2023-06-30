@@ -7,6 +7,8 @@ from spotipy.oauth2 import SpotifyOAuth
 import json
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+
 
 def index(request):
     auth_url= get_authorization_url()
@@ -31,11 +33,15 @@ def upload(request):
 def process_image(request):
     if request.method == 'POST':
         image = request.FILES['image']
+        if image is not None:
+            print('porcodio')
+
         # Process the image here
         # You can access the uploaded image using `image` variable
         # Perform any desired image processing tasks
         
         # Return the processed image or relevant information
+
         return render(request, 'result.html', {'image_url': image.url})
 
     return render(request, 'upload.html')
@@ -65,8 +71,6 @@ def map_features(tracks, token):
         coordinates[i, 0] = x
         coordinates[i, 1] = y
 
-    print(coordinates)
-
     x0 = coordinates[0, 0]
     y0 = coordinates[0, 1]
     x2 = coordinates[1, 0]
@@ -85,7 +89,7 @@ def map_features(tracks, token):
     return x1, y1
 
 def create_style(x1, y1):
-    img = cv2.imread('roy.jpeg')
+    img = cv2.imread('/Users/violanegroni/Documents/GitHub/CPAC22-Project/django_cpac/roy.jpeg')
 
     # Quadrant I: x > 0, y > 0
     if x1 > 0 and y1 > 0:
