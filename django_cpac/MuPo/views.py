@@ -23,24 +23,29 @@ def postauth(request):
     tracks = get_recently_played(access_token)
 
     x1, y1 = map_features(tracks, access_token)
-    create_style(x1, y1)
+    # change_mood(x1, y1)
+
+    request.session['x1'] = x1
+    request.session['y1'] = y1
+    print(f'Coordinates stored: {x1}, {y1}')
 
     return render(request, 'postauth.html', {'tracks': tracks})
 
 def upload(request):
+    process_image(request)
     return render(request, 'upload.html')
 
 def process_image(request):
     if request.method == 'POST':
         image = request.FILES['image']
         if image is not None:
-            print('porcodio')
+            print('Non ci siamo')
 
-        # Process the image here
-        # You can access the uploaded image using `image` variable
-        # Perform any desired image processing tasks
-        
-        # Return the processed image or relevant information
+        x1 = request.session.get('x1')
+        y1 = request.session.get('y1')
+        print(f'Coordinates retrieved: {x1}, {y1}')
+        moody_img = change_mood(image, x1, y1)
+        print('Got moody image')
 
         return render(request, 'result.html', {'image_url': image.url})
 
@@ -88,8 +93,9 @@ def map_features(tracks, token):
 
     return x1, y1
 
-def create_style(x1, y1):
-    img = cv2.imread('/Users/violanegroni/Documents/GitHub/CPAC22-Project/django_cpac/roy.jpeg')
+def change_mood(uploaded_img, x1, y1):
+    # img = cv2.imread('/Users/violanegroni/Documents/GitHub/CPAC22-Project/django_cpac/roy.jpeg')
+    img = uploaded_img
 
     # Quadrant I: x > 0, y > 0
     if x1 > 0 and y1 > 0:
@@ -105,9 +111,11 @@ def create_style(x1, y1):
         colormap = cv2.COLORMAP_SUMMER #green, relax
 
     img = cv2.applyColorMap(img, colormap)
-    cv2.imwrite('style.png', img)
+    cv2.imwrite('image_ready.png', img)
 
-    print('Style image processed and saved.')
+    print('Image processed and saved.')
+
+    return img
 
 
 def get_access_token(request):
