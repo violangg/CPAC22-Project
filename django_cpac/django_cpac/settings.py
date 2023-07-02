@@ -129,3 +129,5 @@ SESSION_COOKIE_SECURE = False
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  #/Users/violanegroni/Documents/GitHub/CPAC22-Project/django_cpac/media
 MEDIA_URL = '/media/'
 
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

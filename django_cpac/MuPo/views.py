@@ -12,7 +12,7 @@ from .models import Coordinates
 import os
 from django.conf import settings
 import torch
-from NeuralNetworks import TransformerNetwork, load_image, itot, ttoi, transfer_color
+from MuPo.NeuralNetworks import TransformerNetwork, load_image, itot, ttoi, transfer_color
 
 def index(request):
     auth_url= get_authorization_url()
@@ -116,6 +116,18 @@ def process_image(request):
         img = np.frombuffer(img, np.uint8)
         img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
+        height, width = img.shape[:2]
+        print(height, width)
+
+        max_size = 400
+        if width > height:
+            new_width = max_size
+            new_height = int(height * (max_size / width))
+        else:
+            new_height = max_size
+            new_width = int(width * (max_size / height))
+
+        img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
         # Quadrant I: x > 0, y > 0
         if x1 > 0 and y1 > 0:
@@ -130,15 +142,6 @@ def process_image(request):
         elif x1 > 0 and y1 < 0:
             colormap = cv2.COLORMAP_SUMMER #green, relax
 
-        # img = cv2.applyColorMap(img, colormap)
-        # cv2.imwrite('processed_image.png', img)
-
-        # print('Image processed and saved.')
-
-        # _, img_png = cv2.imencode('.png', img)
-        # image_data = img_png.tobytes()
-        # return image_data
-
         img = cv2.applyColorMap(img, colormap)
 
         img = stylize(img)
@@ -150,29 +153,25 @@ def process_image(request):
         return render(request, 'upload.html')
 
 
-def stylize():
+def stylize(img):
     device = ("cuda" if torch.cuda.is_available() else "cpu")
 
-    STYLE_TRANSFORM_PATH = "udnie_aggressive.pth"
-    PRESERVE_COLOR = True
+    STYLE_TRANSFORM_PATH = "MuPo/udnie_aggressive.pth"
 
     net = TransformerNetwork()
     net.load_state_dict(torch.load(STYLE_TRANSFORM_PATH, map_location=torch.device('cpu')))
     net = net.to(device)
 
-    with torch.no_grad():
-        while(1):
-            torch.cuda.empty_cache()
-            print("Stylize Image~ Press Ctrl+C and Enter to close the program")
-            content_image_path = input("Enter the image path: ")
-            content_image = load_image(content_image_path)
-            content_tensor = itot(content_image).to(device)
-            generated_tensor = net(content_tensor)
-            generated_image = ttoi(generated_tensor.detach())
-            if (PRESERVE_COLOR):
-                generated_image = transfer_color(content_image, generated_image)
+    with torch.no_grad(): 
+        torch.cuda.empty_cache()
+        # content_image_path = img
+        # content_image = load_image(content_image_path)
+        content_tensor = itot(img).to(device)
+        generated_tensor = net(content_tensor)
+        generated_image = ttoi(generated_tensor.detach())
+        processed_image = transfer_color(img, generated_image)
     
-    return generated_image
+    return processed_image
 
 
 
