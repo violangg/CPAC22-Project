@@ -8,7 +8,11 @@ import json
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-
+from .models import Coordinates
+import os
+from django.conf import settings
+import torch
+from NeuralNetworks import TransformerNetwork, load_image, itot, ttoi, transfer_color
 
 def index(request):
     auth_url= get_authorization_url()
@@ -22,37 +26,36 @@ def postauth(request):
     access_token = token['access_token']
     tracks = get_recently_played(access_token)
 
-    x1, y1 = map_features(tracks, access_token)
-    # change_mood(x1, y1)
-
-    request.session['x1'] = x1
-    request.session['y1'] = y1
-    print(f'Coordinates stored: {x1}, {y1}')
+    map_features(request, tracks, access_token)
 
     return render(request, 'postauth.html', {'tracks': tracks})
 
 def upload(request):
-    process_image(request)
-    return render(request, 'upload.html')
-
-def process_image(request):
     if request.method == 'POST':
-        image = request.FILES['image']
-        if image is not None:
-            print('Non ci siamo')
+        processed_image_data = process_image(request)
 
-        x1 = request.session.get('x1')
-        y1 = request.session.get('y1')
-        print(f'Coordinates retrieved: {x1}, {y1}')
-        moody_img = change_mood(image, x1, y1)
-        print('Got moody image')
-
-        return render(request, 'result.html', {'image_url': image.url})
-
+        if processed_image_data is not None: 
+            save_processed_image(processed_image_data)           
+            return redirect('result')
+    
     return render(request, 'upload.html')
 
+def result(request):
+    image_path = 'processed_image.png'
+    image_url = settings.MEDIA_URL + image_path
 
-def map_features(tracks, token): 
+    return render(request, 'result.html', {'image_url': image_url})   
+
+
+
+
+def save_processed_image(img):
+    media_root = settings.MEDIA_ROOT
+    image_path = os.path.join(media_root, 'processed_image.png')
+    cv2.imwrite(image_path, img)
+    #cv2.imwrite('processed_image.png', img)
+
+def map_features(request, tracks, token): 
     valence_values = []
     arousal_values = []
 
@@ -89,33 +92,88 @@ def map_features(tracks, token):
 
     x1 = np.mean([x0, x2, x3, x4, x5])
     y1 = np.mean([y0, y2, y3, y4, y5])
-    print('Coordinates correctly computed')
+    print(f'Coordinates correctly computed: {x1}, {y1}')
 
-    return x1, y1
+    coord = Coordinates(x=x1, y=y1)
+    coord.save()
 
-def change_mood(uploaded_img, x1, y1):
+def process_image(request):
     # img = cv2.imread('/Users/violanegroni/Documents/GitHub/CPAC22-Project/django_cpac/roy.jpeg')
-    img = uploaded_img
 
-    # Quadrant I: x > 0, y > 0
-    if x1 > 0 and y1 > 0:
-        colormap = cv2.COLORMAP_SPRING # yellow/pink, euphoria
-    # Quadrant II: x < 0, y > 0
-    elif x1 < 0 and y1 > 0:
-        colormap = cv2.COLORMAP_HOT #red/yellow, anger
-    # Quadrant III: x < 0, y < 0
-    elif x1 < 0 and y1 < 0:
-        colormap = cv2.COLORMAP_OCEAN # blue, sadness  
-    # Quadrant IV: x > 0, y < 0
-    elif x1 > 0 and y1 < 0:
-        colormap = cv2.COLORMAP_SUMMER #green, relax
+    coord = Coordinates.objects.latest('id')
+    x1 = coord.x
+    y1 = coord.y 
+    print(f'Coordinates retrieved: {x1}, {y1}')
 
-    img = cv2.applyColorMap(img, colormap)
-    cv2.imwrite('image_ready.png', img)
 
-    print('Image processed and saved.')
+    if request.method == 'POST':
+        print('POST request received')
+        uploaded_file = request.FILES['image']
+        if uploaded_file is None:
+            print('...but no img retrieved')
+    
+        img = uploaded_file.read()
+        img = np.frombuffer(img, np.uint8)
+        img = cv2.imdecode(img, cv2.IMREAD_COLOR)
 
-    return img
+
+        # Quadrant I: x > 0, y > 0
+        if x1 > 0 and y1 > 0:
+            colormap = cv2.COLORMAP_SPRING # yellow/pink, euphoria
+        # Quadrant II: x < 0, y > 0
+        elif x1 < 0 and y1 > 0:
+            colormap = cv2.COLORMAP_HOT #red/yellow, anger
+        # Quadrant III: x < 0, y < 0
+        elif x1 < 0 and y1 < 0:
+            colormap = cv2.COLORMAP_OCEAN # blue, sadness  
+        # Quadrant IV: x > 0, y < 0
+        elif x1 > 0 and y1 < 0:
+            colormap = cv2.COLORMAP_SUMMER #green, relax
+
+        # img = cv2.applyColorMap(img, colormap)
+        # cv2.imwrite('processed_image.png', img)
+
+        # print('Image processed and saved.')
+
+        # _, img_png = cv2.imencode('.png', img)
+        # image_data = img_png.tobytes()
+        # return image_data
+
+        img = cv2.applyColorMap(img, colormap)
+
+        img = stylize(img)
+
+        return img
+
+    else:
+        print('Not a POST request')
+        return render(request, 'upload.html')
+
+
+def stylize():
+    device = ("cuda" if torch.cuda.is_available() else "cpu")
+
+    STYLE_TRANSFORM_PATH = "udnie_aggressive.pth"
+    PRESERVE_COLOR = True
+
+    net = TransformerNetwork()
+    net.load_state_dict(torch.load(STYLE_TRANSFORM_PATH, map_location=torch.device('cpu')))
+    net = net.to(device)
+
+    with torch.no_grad():
+        while(1):
+            torch.cuda.empty_cache()
+            print("Stylize Image~ Press Ctrl+C and Enter to close the program")
+            content_image_path = input("Enter the image path: ")
+            content_image = load_image(content_image_path)
+            content_tensor = itot(content_image).to(device)
+            generated_tensor = net(content_tensor)
+            generated_image = ttoi(generated_tensor.detach())
+            if (PRESERVE_COLOR):
+                generated_image = transfer_color(content_image, generated_image)
+    
+    return generated_image
+
 
 
 def get_access_token(request):
