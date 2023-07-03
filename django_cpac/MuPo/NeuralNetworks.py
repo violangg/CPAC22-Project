@@ -109,28 +109,6 @@ class DeconvLayer(nn.Module):
         return out
 
 
-# Load image file
-def load_image(path):
-    # Images loaded as BGR
-    img = cv2.imread(path)
-    return img
-
-# Show image
-def show(img):
-    # Convert from BGR to RGB
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
-    # imshow() only accepts float [0,1] or int [0,255]
-    img = np.array(img/255).clip(0,1)
-    
-    plt.figure(figsize=(10, 5))
-    plt.imshow(img)
-    plt.show()
-
-def saveimg(img, image_path):
-    img = img.clip(0, 255)
-    cv2.imwrite(image_path, img)
-
 # Preprocessing ~ Image to Tensor
 def itot(img, max_size=None):
     # Rescale the image
@@ -159,10 +137,6 @@ def itot(img, max_size=None):
 
 # Preprocessing ~ Tensor to Image
 def ttoi(tensor):
-    # Add the means
-    #ttoi_t = transforms.Compose([
-    #    transforms.Normalize([-103.939, -116.779, -123.68],[1,1,1])])
-
     # Remove the batch_size dimension
     tensor = tensor.squeeze()
     #img = ttoi_t(tensor)

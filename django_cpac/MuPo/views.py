@@ -12,7 +12,7 @@ from .models import Coordinates
 import os
 from django.conf import settings
 import torch
-from MuPo.NeuralNetworks import TransformerNetwork, load_image, itot, ttoi, transfer_color
+from MuPo.NeuralNetworks import TransformerNetwork, itot, ttoi, transfer_color
 
 def index(request):
     auth_url= get_authorization_url()
