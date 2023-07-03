@@ -119,7 +119,7 @@ def process_image(request):
         height, width = img.shape[:2]
         print(height, width)
 
-        max_size = 400
+        max_size = 500
         if width > height:
             new_width = max_size
             new_height = int(height * (max_size / width))
